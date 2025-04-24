@@ -2,8 +2,7 @@ name: Build APK
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
+    branches: [main]
 
 jobs:
   build:
@@ -18,14 +17,19 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: Grant gradlew permission
+      - name: Give gradlew permission
         run: chmod +x ./gradlew
 
       - name: Build APK
         run: ./gradlew assembleDebug
 
-      - name: Upload APK
+      - name: Compress APK
+        run: |
+          mkdir output
+          zip -j output/my-demo-$(date +%Y%m%d-%H%M).zip app/build/outputs/apk/debug/*.apk
+
+      - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: my-demo-apk
-          path: app/build/outputs/apk/debug/*.apk
+          name: release-apk
+          path: output/*.zip
